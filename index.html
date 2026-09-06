@@ -1,211 +1,120 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pride AI - Vision Agent</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #131314;
-            color: #e3e3e3;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-        .container {
-            width: 100%;
-            max-width: 650px;
-            background: #1e1f20;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-            text-align: center;
-        }
-        h2 { margin-top: 0; color: #fff; font-weight: 500; font-size: 24px; }
-        p { color: #8e918f; font-size: 14px; margin-bottom: 20px; }
-        .upload-box {
-            display: block;
-            border: 2px dashed #444746;
-            padding: 25px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin: 15px 0;
-            transition: 0.3s;
-            background: #28292a;
-            box-sizing: border-box;
-            width: 100%;
-        }
-        .upload-box:hover { border-color: #a8c7fa; background: #2f3132; }
-        input[type="file"] { display: none; }
-        #preview {
-            max-width: 100%;
-            max-height: 250px;
-            border-radius: 8px;
-            display: none;
-            margin: 15px auto;
-        }
-        button {
-            background-color: #a8c7fa;
-            color: #000;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 24px;
-            cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-            margin-top: 10px;
-        }
-        button:hover { background-color: #d3e3fd; }
-        #results {
-            margin-top: 25px;
-            text-align: left;
-            background: #131314;
-            padding: 20px;
-            border-radius: 12px;
-            display: none;
-            border: 1px solid #333;
-        }
-        .section-title { color: #a8c7fa; font-size: 14px; font-weight: 600; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
-        .meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            font-size: 13px;
-            color: #c4c7c5;
-            background: #222325;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .feature-card {
-            background: #28292a;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #a8c7fa;
-            font-size: 14px;
-        }
-        .loading { color: #a8c7fa; font-style: italic; display: none; margin-top: 15px; }
-    </style>
-</head>
-<body>
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const uploadText = document.getElementById('uploadText');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    let selectedFile = null;
 
-    <div class="container">
-        <h2>✨ Pride AI</h2>
-        <p>Upload an image for complete structural and feature extraction.</p>
-
-        <label class="upload-box" id="dropZone">
-            <span id="uploadText">📁 Click to upload or snap a photo</span>
-            <input type="file" id="imageInput" accept="image/*"> 
-        </label>
-
-        <img id="preview" alt="Image preview">
-        
-        <button id="analyzeBtn" style="display:none;" onclick="uploadImage()">Extract Full Features</button>
-        <div class="loading" id="loadingText">Pride AI is deep scanning image features... please wait...</div>
-
-        <div id="results">
-            <h4 id="resultSummary" style="margin-top:0; color:#a8c7fa;"></h4>
-            
-            <div class="section-title">Technical Metadata</div>
-            <div class="meta-grid" id="metaGrid"></div>
-
-            <div class="section-title">Detected Features & Objects</div>
-            <div id="featureList"></div>
-        </div>
-    </div>
-
-    <script>
-        const imageInput = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
-        const uploadText = document.getElementById('uploadText');
-        const analyzeBtn = document.getElementById('analyzeBtn');
-        let selectedFile = null;
-
-        imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                selectedFile = file;
-                preview.src = URL.createObjectURL(file);
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            compressImage(file, (compressedBlob) => {
+                selectedFile = compressedBlob;
+                preview.src = URL.createObjectURL(compressedBlob);
                 preview.style.display = 'block';
                 uploadText.style.display = 'none';
                 analyzeBtn.style.display = 'block';
                 document.getElementById('results').style.display = 'none';
-            }
-        });
-
-        async function uploadImage() {
-            if (!selectedFile) return;
-
-            const formData = new FormData();
-            formData.append('file', selectedFile);
-
-            document.getElementById('loadingText').style.display = 'block';
-            analyzeBtn.style.display = 'none';
-            document.getElementById('results').style.display = 'none';
-
-            try {
-                const response = await fetch('/extract-yolo', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Server processing failed');
-                }
-
-                const data = await response.json();
-                
-                document.getElementById('loadingText').style.display = 'none';
-                analyzeBtn.style.display = 'block';
-
-                const output = data.agent_output;
-                document.getElementById('resultSummary').innerText = output.summary;
-                
-                const metaGrid = document.getElementById('metaGrid');
-                const m = output.image_metadata;
-                const rgb = output.color_profile.average_rgb;
-                metaGrid.innerHTML = `
-                    <div><b>Dimensions:</b> ${m.width_pixels} x ${m.height_pixels} px</div>
-                    <div><b>Format:</b> ${m.format} (${m.color_mode})</div>
-                    <div style="grid-column: span 2;"><b>Avg RGB Tone:</b> R:${rgb[0]} G:${rgb[1]} B:${rgb[2]}</div>
-                `;
-
-                const listContainer = document.getElementById('featureList');
-                listContainer.innerHTML = '';
-                
-                if(output.detailed_features.length === 0) {
-                    listContainer.innerHTML = '<span style="color:#8e918f;">No distinct objects recognized.</span>';
-                } else {
-                    output.detailed_features.forEach(item => {
-                        const card = document.createElement('div');
-                        card.className = 'feature-card';
-                        card.innerHTML = `
-                            <span>🏷️ <b>${item.feature_name}</b></span>
-                            <span style="color: #a8c7fa; font-weight: 500;">Confidence: ${item.confidence_score}</span>
-                        `;
-                        listContainer.appendChild(card);
-                    });
-                }
-                document.getElementById('results').style.display = 'block';
-
-            } catch (err) {
-                alert('Error processing image on mobile. Please try a smaller image file.');
-                document.getElementById('loadingText').style.display = 'none';
-                analyzeBtn.style.display = 'block';
-            }
+            });
         }
-    </script>
-</body>
-</html>
+    });
+
+    function compressImage(file, callback) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const img = new Image();
+            img.onload = function () {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                
+                // Max dimension limit for free tier RAM protection
+                const MAX_DIMENSION = 800;
+                if (width > height) {
+                    if (width > MAX_DIMENSION) {
+                        height *= MAX_DIMENSION / width;
+                        width = MAX_DIMENSION;
+                    }
+                } else {
+                    if (height > MAX_DIMENSION) {
+                        width *= MAX_DIMENSION / height;
+                        height = MAX_DIMENSION;
+                    }
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob((blob) => {
+                    callback(blob);
+                }, 'image/jpeg', 0.7); // 70% quality compression
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function uploadImage() {
+        if (!selectedFile) return;
+
+        const formData = new FormData();
+        formData.append('file', selectedFile, 'image.jpg');
+
+        document.getElementById('loadingText').style.display = 'block';
+        analyzeBtn.style.display = 'none';
+        document.getElementById('results').style.display = 'none';
+
+        try {
+            const response = await fetch('/extract-yolo', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Server processing failed');
+            }
+
+            const data = await response.json();
+            
+            document.getElementById('loadingText').style.display = 'none';
+            analyzeBtn.style.display = 'block';
+
+            const output = data.agent_output;
+            document.getElementById('resultSummary').innerText = output.summary;
+            
+            const metaGrid = document.getElementById('metaGrid');
+            const m = output.image_metadata;
+            const rgb = output.color_profile.average_rgb;
+            metaGrid.innerHTML = `
+                <div><b>Dimensions:</b> ${m.width_pixels} x ${m.height_pixels} px</div>
+                <div><b>Format:</b> ${m.format} (${m.color_mode})</div>
+                <div style="grid-column: span 2;"><b>Avg RGB Tone:</b> R:${rgb[0]} G:${rgb[1]} B:${rgb[2]}</div>
+            `;
+
+            const listContainer = document.getElementById('featureList');
+            listContainer.innerHTML = '';
+            
+            if(output.detailed_features.length === 0) {
+                listContainer.innerHTML = '<span style="color:#8e918f;">No distinct objects recognized.</span>';
+            } else {
+                output.detailed_features.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'feature-card';
+                    card.innerHTML = `
+                        <span>🏷️ <b>${item.feature_name}</b></span>
+                        <span style="color: #a8c7fa; font-weight: 500;">Confidence: ${item.confidence_score}</span>
+                    `;
+                    listContainer.appendChild(card);
+                });
+            }
+            document.getElementById('results').style.display = 'block';
+
+        } catch (err) {
+            alert('Error processing image. Please try again.');
+            document.getElementById('loadingText').style.display = 'none';
+            analyzeBtn.style.display = 'block';
+        }
+    }
+</script>
