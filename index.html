@@ -106,8 +106,8 @@
         <p>Upload an image for complete structural and feature extraction.</p>
 
         <label class="upload-box" id="dropZone">
-            <span id="uploadText">📁 Click to upload an image or drag it here</span>
-            <input type="file" id="imageInput" accept="image/*">
+            <span id="uploadText">📁 Click to upload or snap a photo</span>
+            <input type="file" id="imageInput" accept="image/*" capture="environment">
         </label>
 
         <img id="preview" alt="Image preview">
@@ -131,10 +131,12 @@
         const preview = document.getElementById('preview');
         const uploadText = document.getElementById('uploadText');
         const analyzeBtn = document.getElementById('analyzeBtn');
+        let selectedFile = null;
 
         imageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                selectedFile = file;
                 preview.src = URL.createObjectURL(file);
                 preview.style.display = 'block';
                 uploadText.style.display = 'none';
@@ -144,11 +146,10 @@
         });
 
         async function uploadImage() {
-            const file = imageInput.files[0];
-            if (!file) return;
+            if (!selectedFile) return;
 
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', selectedFile);
 
             document.getElementById('loadingText').style.display = 'block';
             analyzeBtn.style.display = 'none';
@@ -159,6 +160,11 @@
                     method: 'POST',
                     body: formData
                 });
+                
+                if (!response.ok) {
+                    throw new Error('Server processing failed');
+                }
+
                 const data = await response.json();
                 
                 document.getElementById('loadingText').style.display = 'none';
@@ -167,7 +173,6 @@
                 const output = data.agent_output;
                 document.getElementById('resultSummary').innerText = output.summary;
                 
-                // Populate Metadata
                 const metaGrid = document.getElementById('metaGrid');
                 const m = output.image_metadata;
                 const rgb = output.color_profile.average_rgb;
@@ -177,7 +182,6 @@
                     <div style="grid-column: span 2;"><b>Avg RGB Tone:</b> R:${rgb[0]} G:${rgb[1]} B:${rgb[2]}</div>
                 `;
 
-                // Populate Detailed Features
                 const listContainer = document.getElementById('featureList');
                 listContainer.innerHTML = '';
                 
@@ -197,7 +201,7 @@
                 document.getElementById('results').style.display = 'block';
 
             } catch (err) {
-                alert('Error processing image');
+                alert('Error processing image on mobile. Please try a smaller image file.');
                 document.getElementById('loadingText').style.display = 'none';
                 analyzeBtn.style.display = 'block';
             }
