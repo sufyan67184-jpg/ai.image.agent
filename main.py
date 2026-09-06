@@ -7,9 +7,15 @@ from agent import YOLOFeatureAgent
 app = FastAPI(title="AI Vision Agent", version="2.0")
 agent = YOLOFeatureAgent()
 
+@app.get("/", response_class=HTMLResponse)
+async def serve_root():
+    # Serves the user interface directly at the root URL
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
+
 @app.get("/pride-ai", response_class=HTMLResponse)
 async def serve_ui():
-    # Serves our clean ChatGPT-style user interface page automatically
+    # Serves our clean user interface page automatically
     with open("index.html", "r", encoding="utf-8") as f:
         return f.read()
 
