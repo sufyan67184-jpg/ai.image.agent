@@ -19,10 +19,10 @@
         }
         .card {
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            max-width: 420px;
+            max-width: 450px;
             width: 90%;
             position: relative;
             z-index: 10;
@@ -30,13 +30,13 @@
         h1 {
             color: #ff4757;
             margin-bottom: 10px;
-            font-size: 26px;
+            font-size: 24px;
         }
         p {
             color: #57606f;
-            font-size: 16px;
+            font-size: 15px;
             line-height: 1.5;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         /* Cake & Candles Section */
         .cake-section {
@@ -44,7 +44,6 @@
             border: 2px dashed #ff4757;
             border-radius: 15px;
             padding: 15px;
-            margin-bottom: 10px;
         }
         .candles-grid {
             display: grid;
@@ -76,16 +75,37 @@
         .hidden-card {
             display: none;
         }
+        /* Photo Grid Layout */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .photo-frame {
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .photo-frame img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
         .btn-group {
             display: flex;
             justify-content: center;
             gap: 20px;
             position: relative;
             height: 50px;
+            margin-top: 20px;
         }
         button {
-            padding: 12px 25px;
-            font-size: 16px;
+            padding: 10px 20px;
+            font-size: 15px;
             font-weight: bold;
             border: none;
             border-radius: 25px;
@@ -138,9 +158,23 @@
             </div>
         </div>
 
-        <!-- STEP 2: The Flirty Card (Hidden until candles are done) -->
+        <!-- STEP 2: The Flirty Card + Photos (Hidden until candles are done) -->
         <div id="flirtyContent" class="hidden-card">
             <h1>Happy Birthday, Aliza! 🎉</h1>
+            
+            <!-- 3 Photo Frames -->
+            <div class="photo-grid">
+                <div class="photo-frame">
+                    <img src="aliza_1.jpg" alt="Memory 1">
+                </div>
+                <div class="photo-frame">
+                    <img src="aliza_2.jpg" alt="Memory 2">
+                </div>
+                <div class="photo-frame">
+                    <img src="aliza_3.jpg" alt="Memory 3">
+                </div>
+            </div>
+
             <p id="messageText">
                 Honestly, the hardest part of today is trying to focus on anything else when someone this gorgeous is celebrating. ✨ Ready to celebrate properly? 😉
             </p>
@@ -175,7 +209,7 @@
                 document.getElementById('candlesLeft').innerText = candlesRemaining;
 
                 if (candlesRemaining === 0) {
-                    // Smooth transition: Hide cake, show flirty card
+                    // Smooth transition: Hide cake, show flirty card + photos
                     document.getElementById('cakeSection').style.display = 'none';
                     document.getElementById('flirtyContent').style.display = 'block';
                 }
