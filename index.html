@@ -14,9 +14,27 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
             text-align: center;
         }
+        /* Corner Doodle Decorations */
+        .corner-doodle {
+            position: absolute;
+            font-size: 28px;
+            animation: bounceDoodle 3s infinite ease-in-out;
+            z-index: 5;
+            opacity: 0.8;
+        }
+        .top-left { top: 20px; left: 20px; }
+        .top-right { top: 20px; right: 20px; animation-delay: 0.5s; }
+        .bottom-left { bottom: 20px; left: 20px; animation-delay: 1s; }
+        .bottom-right { bottom: 20px; right: 20px; animation-delay: 1.5s; }
+
+        @keyframes bounceDoodle {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+
         .card {
             background: white;
             padding: 30px;
@@ -142,6 +160,17 @@
 </head>
 <body>
 
+    <!-- Corner Doodles -->
+    <div class="corner-doodle top-left">🎂</div>
+    <div class="corner-doodle top-right">🎈</div>
+    <div class="corner-doodle bottom-left">💖</div>
+    <div class="corner-doodle bottom-right">🎁</div>
+
+    <!-- Background Audio Element -->
+    <audio id="bgMusic" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- Floating background animation elements -->
     <div id="hearts-container"></div>
 
@@ -162,7 +191,7 @@
         <div id="flirtyContent" class="hidden-card">
             <h1>Happy Birthday, Aliza! 🎉</h1>
             
-            <!-- 3 Photo Frames (Using .jpeg extension) -->
+            <!-- 3 Photo Frames -->
             <div class="photo-grid">
                 <div class="photo-frame">
                     <img src="aliza_1..jpeg" alt="Memory 1">
@@ -187,6 +216,17 @@
     </div>
 
     <script>
+        // Audio playback handler
+        let musicStarted = false;
+        function playMusic() {
+            if (!musicStarted) {
+                const music = document.getElementById('bgMusic');
+                music.volume = 0.5;
+                music.play().catch(error => console.log("Audio play blocked: ", error));
+                musicStarted = true;
+            }
+        }
+
         // Generate 21 Candles
         let candlesRemaining = 21;
         const grid = document.getElementById('candlesGrid');
@@ -196,7 +236,10 @@
             candle.classList.add('candle');
             candle.id = 'candle-' + i;
             candle.innerHTML = '🕯️ ' + i;
-            candle.onclick = function() { blowCandle(i); };
+            candle.onclick = function() { 
+                playMusic();
+                blowCandle(i); 
+            };
             grid.appendChild(candle);
         }
 
@@ -209,7 +252,6 @@
                 document.getElementById('candlesLeft').innerText = candlesRemaining;
 
                 if (candlesRemaining === 0) {
-                    // Smooth transition: Hide cake, show flirty card + photos
                     document.getElementById('cakeSection').style.display = 'none';
                     document.getElementById('flirtyContent').style.display = 'block';
                 }
@@ -226,6 +268,7 @@
 
         // Triggered when they click Yes
         function sayYes() {
+            playMusic();
             const card = document.getElementById('mainCard');
             card.innerHTML = `
                 <h1 style="color: #2ed573;">Best choice ever! 🥰</h1>
