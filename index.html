@@ -3,247 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pride AI - Vision Agent</title>
+    <title>Happy Birthday! ✨</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #131314;
-            color: #e3e3e3;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-        .container {
-            width: 100%;
-            max-width: 650px;
-            background: #1e1f20;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            box-sizing: border-box;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
             text-align: center;
         }
-        h2 { margin-top: 0; color: #fff; font-weight: 500; font-size: 24px; }
-        p { color: #8e918f; font-size: 14px; margin-bottom: 20px; }
-        .upload-box {
-            display: block;
-            border: 2px dashed #444746;
-            padding: 25px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin: 15px 0;
-            transition: 0.3s;
-            background: #28292a;
-            box-sizing: border-box;
-            width: 100%;
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            z-index: 10;
         }
-        .upload-box:hover { border-color: #a8c7fa; background: #2f3132; }
-        input[type="file"] { display: none; }
-        #preview {
-            max-width: 100%;
-            max-height: 250px;
-            border-radius: 8px;
-            display: none;
-            margin: 15px auto;
+        h1 {
+            color: #ff4757;
+            margin-bottom: 10px;
+            font-size: 26px;
+        }
+        p {
+            color: #57606f;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            height: 50px;
         }
         button {
-            background-color: #a8c7fa;
-            color: #000;
-            border: none;
-            padding: 12px 24px;
+            padding: 12px 25px;
             font-size: 16px;
-            font-weight: 600;
-            border-radius: 24px;
+            font-weight: bold;
+            border: none;
+            border-radius: 25px;
             cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-            margin-top: 10px;
+            transition: 0.2s ease;
         }
-        button:hover { background-color: #d3e3fd; }
-        #results {
-            margin-top: 25px;
-            text-align: left;
-            background: #131314;
-            padding: 20px;
-            border-radius: 12px;
-            display: none;
-            border: 1px solid #333;
+        #yesBtn {
+            background-color: #ff4757;
+            color: white;
         }
-        .section-title { color: #a8c7fa; font-size: 14px; font-weight: 600; margin: 15px 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
-        .meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            font-size: 13px;
-            color: #c4c7c5;
-            background: #222325;
-            padding: 10px;
-            border-radius: 8px;
+        #yesBtn:hover {
+            background-color: #ff6b81;
+            transform: scale(1.05);
         }
-        .feature-card {
-            background: #28292a;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #a8c7fa;
-            font-size: 14px;
+        #noBtn {
+            background-color: #dfe4ea;
+            color: #2f3542;
+            position: absolute;
         }
-        .loading { color: #a8c7fa; font-style: italic; display: none; margin-top: 15px; }
+        /* Floating background hearts styling */
+        .heart {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 20px;
+            animation: floatUp 4s infinite linear;
+            z-index: 1;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>✨ Pride AI</h2>
-        <p>Upload an image for complete structural and feature extraction.</p>
+    <!-- Floating background animation elements -->
+    <div id="hearts-container"></div>
 
-        <label class="upload-box" id="dropZone">
-            <span id="uploadText">📁 Click to upload or snap a photo</span>
-            <input type="file" id="imageInput" accept="image/*">
-        </label>
-
-        <img id="preview" alt="Image preview">
-        
-        <button id="analyzeBtn" style="display:none;" onclick="uploadImage()">Extract Full Features</button>
-        <div class="loading" id="loadingText">Pride AI is deep scanning image features... please wait...</div>
-
-        <div id="results">
-            <h4 id="resultSummary" style="margin-top:0; color:#a8c7fa;"></h4>
-            
-            <div class="section-title">Technical Metadata</div>
-            <div class="meta-grid" id="metaGrid"></div>
-
-            <div class="section-title">Detected Features & Objects</div>
-            <div id="featureList"></div>
+    <div class="card" id="mainCard">
+        <h1>Happy Birthday! 🎉</h1>
+        <p id="messageText">
+            Honestly, the hardest part of today is trying to focus on anything else when someone this gorgeous is celebrating. ✨ Ready to celebrate properly? 😉
+        </p>
+        <div class="btn-group" id="btnGroup">
+            <button id="yesBtn" onclick="sayYes()">Yes, absolutely! 🥂</button>
+            <button id="noBtn" onmouseover="moveNo()" onclick="moveNo()">No way</button>
         </div>
     </div>
 
     <script>
-        const imageInput = document.getElementById('imageInput');
-        const preview = document.getElementById('preview');
-        const uploadText = document.getElementById('uploadText');
-        const analyzeBtn = document.getElementById('analyzeBtn');
-        let selectedFile = null;
-
-        imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                compressImage(file, (compressedBlob) => {
-                    selectedFile = compressedBlob;
-                    preview.src = URL.createObjectURL(compressedBlob);
-                    preview.style.display = 'block';
-                    uploadText.style.display = 'none';
-                    analyzeBtn.style.display = 'block';
-                    document.getElementById('results').style.display = 'none';
-                });
-            }
-        });
-
-        function compressImage(file, callback) {
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                const img = new Image();
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    
-                    const MAX_DIMENSION = 800;
-                    if (width > height) {
-                        if (width > MAX_DIMENSION) {
-                            height *= MAX_DIMENSION / width;
-                            width = MAX_DIMENSION;
-                        }
-                    } else {
-                        if (height > MAX_DIMENSION) {
-                            width *= MAX_DIMENSION / height;
-                            height = MAX_DIMENSION;
-                        }
-                    }
-                    
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    canvas.toBlob((blob) => {
-                        callback(blob);
-                    }, 'image/jpeg', 0.7);
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
+        // Make the "No" button run away from the cursor or touch
+        function moveNo() {
+            const noBtn = document.getElementById('noBtn');
+            const x = Math.random() * 200 - 100;
+            const y = Math.random() * 100 - 50;
+            noBtn.style.transform = `translate(${x}px, ${y}px)`;
         }
 
-        async function uploadImage() {
-            if (!selectedFile) return;
-
-            const formData = new FormData();
-            formData.append('file', selectedFile, 'image.jpg');
-
-            document.getElementById('loadingText').style.display = 'block';
-            analyzeBtn.style.display = 'none';
-            document.getElementById('results').style.display = 'none';
-
-            try {
-                const response = await fetch('/extract-yolo', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Server processing failed');
-                }
-
-                const data = await response.json();
-                
-                document.getElementById('loadingText').style.display = 'none';
-                analyzeBtn.style.display = 'block';
-
-                const output = data.agent_output;
-                document.getElementById('resultSummary').innerText = output.summary;
-                
-                const metaGrid = document.getElementById('metaGrid');
-                const m = output.image_metadata;
-                const rgb = output.color_profile.average_rgb;
-                metaGrid.innerHTML = `
-                    <div><b>Dimensions:</b> ${m.width_pixels} x ${m.height_pixels} px</div>
-                    <div><b>Format:</b> ${m.format} (${m.color_mode})</div>
-                    <div style="grid-column: span 2;"><b>Avg RGB Tone:</b> R:${rgb[0]} G:${rgb[1]} B:${rgb[2]}</div>
-                `;
-
-                const listContainer = document.getElementById('featureList');
-                listContainer.innerHTML = '';
-                
-                if(output.detailed_features.length === 0) {
-                    listContainer.innerHTML = '<span style="color:#8e918f;">No distinct objects recognized.</span>';
-                } else {
-                    output.detailed_features.forEach(item => {
-                        const card = document.createElement('div');
-                        card.className = 'feature-card';
-                        card.innerHTML = `
-                            <span>🏷️ <b>${item.feature_name}</b></span>
-                            <span style="color: #a8c7fa; font-weight: 500;">Confidence: ${item.confidence_score}</span>
-                        `;
-                        listContainer.appendChild(card);
-                    });
-                }
-                document.getElementById('results').style.display = 'block';
-
-            } catch (err) {
-                alert('Error processing image. Please try again.');
-                document.getElementById('loadingText').style.display = 'none';
-                analyzeBtn.style.display = 'block';
-            }
+        // Triggered when they click Yes
+        function sayYes() {
+            const card = document.getElementById('mainCard');
+            card.innerHTML = `
+                <h1 style="color: #2ed573;">Best choice ever! 🥰</h1>
+                <p>Now you officially owe me a slice of cake. Let me take you out to celebrate properly this week! 🎂✨</p>
+                <p style="font-size: 13px; color: #a4b0be; margin-top: 20px;">(Screenshot this and send it to me 😉)</p>
+            `;
         }
+
+        // Generate floating background hearts automatically
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.getElementById('hearts-container').appendChild(heart);
+            setTimeout(() => heart.remove(), 4000);
+        }
+        setInterval(createHeart, 300);
     </script>
 </body>
 </html>
