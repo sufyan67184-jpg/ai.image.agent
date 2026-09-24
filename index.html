@@ -56,6 +56,13 @@
             line-height: 1.5;
             margin-bottom: 20px;
         }
+        /* Intro Overlay */
+        #introScreen {
+            display: block;
+        }
+        .hidden-section {
+            display: none;
+        }
         /* Cake & Candles Section */
         .cake-section {
             background: #fff0f3;
@@ -88,10 +95,6 @@
             color: #a4b0be;
             text-decoration: line-through;
             pointer-events: none;
-        }
-        /* Hidden main card initially */
-        .hidden-card {
-            display: none;
         }
         /* Photo Grid Layout */
         .photo-grid {
@@ -129,6 +132,16 @@
             border-radius: 25px;
             cursor: pointer;
             transition: 0.2s ease;
+        }
+        #startBtn {
+            background-color: #ff4757;
+            color: white;
+            font-size: 16px;
+            padding: 12px 30px;
+        }
+        #startBtn:hover {
+            background-color: #ff6b81;
+            transform: scale(1.05);
         }
         #yesBtn {
             background-color: #ff4757;
@@ -176,8 +189,15 @@
 
     <div class="card" id="mainCard">
         
-        <!-- STEP 1: 21 Candles Challenge Box -->
-        <div id="cakeSection" class="cake-section">
+        <!-- STEP 0: Audio Unlock Intro Screen -->
+        <div id="introScreen">
+            <h1>Hey Aliza! ✨</h1>
+            <p>A little birthday surprise is waiting for you. Turn up your volume and click below to open it! 🎶</p>
+            <button id="startBtn" onclick="startExperience()">Open Your Gift 🎁</button>
+        </div>
+
+        <!-- STEP 1: 21 Candles Challenge Box (Hidden initially) -->
+        <div id="cakeSection" class="cake-section hidden-section">
             <h1 style="font-size: 22px;">Make a Wish! 🎂</h1>
             <p style="margin: 0 0 10px 0; font-size: 14px;" id="candleInstruction">
                 Blow out all 21 candles to unlock your card! (<span id="candlesLeft">21</span> left)
@@ -188,7 +208,7 @@
         </div>
 
         <!-- STEP 2: The Flirty Card + Photos (Hidden until candles are done) -->
-        <div id="flirtyContent" class="hidden-card">
+        <div id="flirtyContent" class="hidden-section">
             <h1>Happy Birthday, Aliza! 🎉</h1>
             
             <!-- 3 Photo Frames -->
@@ -216,15 +236,15 @@
     </div>
 
     <script>
-        // Audio playback handler
-        let musicStarted = false;
-        function playMusic() {
-            if (!musicStarted) {
-                const music = document.getElementById('bgMusic');
-                music.volume = 0.5;
-                music.play().catch(error => console.log("Audio play blocked: ", error));
-                musicStarted = true;
-            }
+        // Start Experience & Unlock Audio
+        function startExperience() {
+            const music = document.getElementById('bgMusic');
+            music.volume = 0.6;
+            music.play().catch(error => console.log("Audio play blocked: ", error));
+
+            // Hide intro, show candles cake section
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('cakeSection').style.display = 'block';
         }
 
         // Generate 21 Candles
@@ -237,7 +257,6 @@
             candle.id = 'candle-' + i;
             candle.innerHTML = '🕯️ ' + i;
             candle.onclick = function() { 
-                playMusic();
                 blowCandle(i); 
             };
             grid.appendChild(candle);
@@ -268,7 +287,6 @@
 
         // Triggered when they click Yes
         function sayYes() {
-            playMusic();
             const card = document.getElementById('mainCard');
             card.innerHTML = `
                 <h1 style="color: #2ed573;">Best choice ever! 🥰</h1>
